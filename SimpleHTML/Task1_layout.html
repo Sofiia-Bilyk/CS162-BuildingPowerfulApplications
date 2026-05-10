@@ -1,0 +1,132 @@
+<!--
+ The page follows a nested container pattern:
+
+1. Outer Layout: `main-region` → `dashboard-layout` → `main-wrapper`
+2. Header: `content-wrapper` → `imagery` → `header` → `header-content`
+3. Body: `content-wrapper` → `stage-wrapper` → sidebar + main article (divs to identify each section)
+5. Footer: Footer content
+-->
+<!DOCTYPE html>
+<html lang="en-US" id="minerva-dashboard">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 1 Layout</title>
+</head>
+
+<body id="minerva-dashboard">
+    <div class="main-region">
+        <div class="dashboard-layout">
+            <section class="top-header-message-region"></section>
+            <button class="mobile-menu-handle">...</button>
+            <div class="main-wrapper">
+                <div class="content-wrapper">
+                    <!-- Background image container -->
+                    <div class="imagery">
+                        <header id="header">
+                            <a class="logo">...</a>
+                            <div class="header-content">
+                                <div class="header">
+                                    <div class="classroom-header-view">
+                                        <section class="main-region">
+                                            <a id="skip-to-content"></a>
+                                            <div class="title-region"></div>
+                                            <section class="message-region"></section>
+                                            <div class="control-center-region">
+                                                <div>
+                                                    <div class="dashboard-control-center-view">
+                                                        <div class="profile">
+                                                            <div class="class-profile-view">
+                                                                <div class="menu-view profile-menu">
+                                                                    <div>...</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="help ml2">
+                                                            <div class="help-menu-view">
+                                                                <div class="menu-view help-menu">...</div>
+                                                                <div class="bug-report-form"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                                <div class="subheader">
+                                    <div class="dashboard-subheader-view">
+                                        <section class="lines">...</section>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+                    </div>
+                    <div class="stage-wrapper">
+                        <aside class="sidebar">
+                            <nav class="sidebar-list-view">
+                                <div id="organization-switcher"></div>
+                                <ul class="sidebar-items-list">...</ul>
+                            </nav>
+                        </aside>
+                        <article id="main-semantic-content" class="stretch">
+                            <div class="content">
+                                <div class="flex flex-column react-router-content">
+                                    <!-- Main page content -->
+                                    <div class="root-0-2-3 home-view">
+                                        <div class="root-0-2-3" data-testid="Box">
+                                            <div class="home-view-left-column" data-testid="Box">
+                                                <div class="root-0-2-3" data-testid="Box">
+                                                    <div class="pb7 next-classes-view">
+                                                        <div class="flex justify-between">
+                                                            <div>
+                                                                <div class="description">...</div>
+                                                            </div>
+                                                            <div class="flex">
+                                                                <div class="root-0-2-3 mr4" data-testid="Box">
+                                                                    <div class="tooltip">...</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <section class="date-region">
+                                                    <div class="date-wrapper">...</div>
+                                                </section>
+                                            </div>
+                                            <div class="root-0-2-3 upcoming-assignments-region">
+                                                <div class="student-assignments-list-view">...</div>
+                                            </div>
+                                            <div class="root-0-2-3 grader-assignments-list-view">
+                                                <div>...</div>
+                                            </div>
+                                            <div class="root-0-2-3 home-view-right-column">
+                                                <div class="root-0-2-3 course-stats-view">
+                                                    <div class="body-s text-black-tint-40 mb3">...</div>
+                                                </div>
+                                                <div class="root-0-2-3 announcements-region">
+                                                    <div class="pb5 announcement-item-view">...</div>
+                                                </div>
+                                                <div class="root-0-2-3 office-hours-region">
+                                                    <div class="mb5 office-hours-item-view">...</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <footer>...</footer>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+            <section class="modal invisible"></section>
+        </div>
+        <div class="modal"></div>
+        <div class="annotator-notice"></div>
+        <div class="intercom-lightweight-app">...</div>
+    </div>
+</body>
+
+</html>
