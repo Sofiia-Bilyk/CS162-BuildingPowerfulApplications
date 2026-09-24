@@ -1,0 +1,11 @@
+﻿__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+instance/
+*.db
+*.sqlite3
+.venv/
+venv/
+node_modules/
