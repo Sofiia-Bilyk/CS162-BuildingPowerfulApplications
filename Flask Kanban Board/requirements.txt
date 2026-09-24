@@ -1,0 +1,17 @@
+# requirements.txt - Python Dependencies for Kanban Board
+#
+# This file lists all Python packages required to run the application.
+# Install them using: pip install -r requirements.txt
+#
+# Technologies (from Flask-Login tutorial):
+# - Flask: The web framework
+# - Flask-SQLAlchemy: SQLAlchemy integration for Flask (database ORM)
+
+# Flask - Lightweight web framework for Python
+# Provides routing, templating (Jinja2), request handling, etc.
+Flask==3.0.0
+
+# Flask-SQLAlchemy - Database ORM integration
+# Makes it easy to work with databases using Python objects
+# SQLAlchemy handles the SQL queries behind the scenes
+Flask-SQLAlchemy==3.1.1

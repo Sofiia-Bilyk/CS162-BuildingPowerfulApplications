@@ -1,0 +1,710 @@
+<!--
+index.html - Main Kanban Board Template
+
+This is the main template for the Kanban Board application.
+It uses Jinja2 templating (built into Flask) to dynamically render tasks.
+
+Jinja2 Syntax Used:
+- double curly braces : Outputs the value of a variable
+- for/endfor : Loop through items
+- if/else/endif : Conditional statements
+- url_for('route_name') : Generates URLs for Flask routes
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+
+    <!-- Google Fonts - DM Sans for clean, modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =================================================================
+           CSS RESET & BASE STYLES
+           ================================================================= */
+
+        /* Reset default browser styles for consistent appearance */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Base body styles */
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =================================================================
+           HEADER STYLES
+           ================================================================= */
+
+        header {
+            background: #1a1d29;
+            color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* =================================================================
+           MAIN CONTENT AREA
+           ================================================================= */
+
+        main {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .board-title {
+            font-size: 0.9rem;
+            color: #5c6370;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* =================================================================
+           TASK FORM STYLES
+           ================================================================= */
+
+        .task-form-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .task-form-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #1a1d29;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .task-form-subtitle {
+            font-size: 0.85rem;
+            color: #8b95a5;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-form {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        /* Responsive grid for form on larger screens */
+        @media (min-width: 600px) {
+            .task-form {
+                grid-template-columns: 1fr 1fr;
+            }
+            .task-form .form-group-full {
+                grid-column: 1 / -1;
+            }
+            .task-form .form-group-submit {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1a1d29;
+            margin-bottom: 0.625rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Blue accent bar before labels */
+        .form-group label::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: linear-gradient(180deg, #4a90d9 0%, #357abd 100%);
+            border-radius: 2px;
+        }
+
+        /* Form input styles */
+        .task-form input,
+        .task-form textarea,
+        .task-form select {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: #1a1d29;
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+
+        .task-form input:hover,
+        .task-form textarea:hover,
+        .task-form select:hover {
+            border-color: #cbd5e0;
+        }
+
+        .task-form input:focus,
+        .task-form textarea:focus,
+        .task-form select:focus {
+            outline: none;
+            border-color: #4a90d9;
+            box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+        }
+
+        .task-form textarea {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .task-form input[type="date"] {
+            cursor: pointer;
+        }
+
+        /* Submit button styles */
+        .task-form button {
+            background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+            color: #fff;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            justify-self: start;
+            box-shadow: 0 2px 8px rgba(74, 144, 217, 0.25);
+            letter-spacing: 0.01em;
+        }
+
+        .task-form button:hover {
+            background: linear-gradient(135deg, #357abd 0%, #2a5f8f 100%);
+            box-shadow: 0 4px 12px rgba(74, 144, 217, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .form-group-submit {
+            margin-top: 0.5rem;
+        }
+
+        /* =================================================================
+           KANBAN COLUMNS STYLES
+           ================================================================= */
+
+        .columns {
+            display: flex;
+            gap: 1rem;
+            min-width: max-content;
+        }
+
+        .column {
+            flex: 0 0 280px;
+            background: #e8eaef;
+            border-radius: 12px;
+            padding: 1rem;
+            min-height: 320px;
+        }
+
+        .column-header {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1a1d29;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Task count badge */
+        .task-count {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        /* Column-specific accent colors */
+        .column.backlog .column-header { border-bottom-color: #8b95a5; }
+        .column.todo .column-header { border-bottom-color: #4a90d9; }
+        .column.progress .column-header { border-bottom-color: #e6a23c; }
+        .column.review .column-header { border-bottom-color: #9b6bcc; }
+        .column.done .column-header { border-bottom-color: #52c41a; }
+
+        /* =================================================================
+           TASK CARD STYLES
+           ================================================================= */
+
+        .task {
+            background: #fff;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            cursor: default;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+
+        /* Column-specific task accent colors */
+        .column.backlog .task { border-left-color: #8b95a5; }
+        .column.todo .task { border-left-color: #4a90d9; }
+        .column.progress .task { border-left-color: #e6a23c; }
+        .column.review .task { border-left-color: #9b6bcc; }
+        .column.done .task { border-left-color: #52c41a; }
+
+        .task:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: #1a1d29;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-meta {
+            font-size: 0.75rem;
+            color: #8b95a5;
+            margin-top: 0.25rem;
+        }
+
+        /* =================================================================
+           TASK ACTIONS (Move & Delete buttons)
+           ================================================================= */
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .task-actions form {
+            display: inline;
+        }
+
+        /* Move button styles */
+        .move-btn {
+            background: #f0f2f5;
+            border: 1px solid #e1e5e9;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .move-btn:hover {
+            background: #e1e5e9;
+        }
+
+        /* Delete button styles */
+        .delete-btn {
+            background: #fff5f5;
+            border: 1px solid #ffccc7;
+            color: #cf1322;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .delete-btn:hover {
+            background: #ffccc7;
+        }
+
+        /* Empty column message */
+        .empty-column {
+            color: #8b95a5;
+            font-size: 0.85rem;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        /* =================================================================
+           FOOTER STYLES
+           ================================================================= */
+
+        footer {
+            background: #1a1d29;
+            color: #a8b3cf;
+            padding: 1rem 1.5rem;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        footer a {
+            color: #6b7fd7;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =================================================================
+         HEADER SECTION
+         ================================================================= -->
+    <header>
+        <h1 class="site-title">Kanban Board</h1>
+    </header>
+
+    <!-- =================================================================
+         MAIN CONTENT SECTION
+         ================================================================= -->
+    <main>
+        <p class="board-title">Project: CS162 Tasks</p>
+
+        <!-- =============================================================
+             ADD NEW TASK FORM
+
+             This form submits to the /add_task route via POST method.
+             The action uses Jinja2's url_for() to generate the correct URL.
+             ============================================================= -->
+        <div class="task-form-container">
+            <h2 class="task-form-title">Add New Task</h2>
+            <p class="task-form-subtitle">Create a new task for your Kanban board (will be added to "To Do" column)</p>
+
+            <!-- Form posts to /add_task route -->
+            <form class="task-form" id="task-form" action="{{ url_for('add_task') }}" method="post">
+
+                <!-- Task Description Input -->
+                <div class="form-group form-group-full">
+                    <label for="task-description">Task Description</label>
+                    <textarea id="task-description" name="task-description"
+                              placeholder="Enter a short description of the task you want to add to the board..."
+                              required rows="3"></textarea>
+                </div>
+
+                <!-- Due Date Input -->
+                <div class="form-group">
+                    <label for="due-date">Due Date</label>
+                    <input type="date" id="due-date" name="due-date" min="">
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-group form-group-submit">
+                    <button type="submit">Add Task</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- =============================================================
+             KANBAN COLUMNS
+
+             Each column displays tasks filtered by their 'column' attribute.
+             The tasks dictionary is passed from the Flask route.
+             ============================================================= -->
+        <div class="columns">
+
+            <!-- BACKLOG COLUMN -->
+            <div class="column backlog">
+                <h2 class="column-header">
+                    Backlog
+                    <!-- Show task count using Jinja2 filter -->
+                    <span class="task-count">{{ tasks.backlog|length }}</span>
+                </h2>
+
+                <!-- Loop through tasks in backlog column -->
+                {% for task in tasks.backlog %}
+                <div class="task">
+                    <div class="task-title">{{ task.description }}</div>
+                    <div class="task-meta">
+                        <!-- Show due date if exists, otherwise show created date -->
+                        {% if task.due_date %}
+                            Due: {{ task.due_date.strftime('%b %d, %Y') }}
+                        {% else %}
+                            Created: {{ task.created_at.strftime('%b %d') }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Task action buttons for moving and deleting -->
+                    <div class="task-actions">
+                        <!-- Move to To Do -->
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="todo">
+                            <button type="submit" class="move-btn">To Do</button>
+                        </form>
+                        <!-- Move to In Progress -->
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="progress">
+                            <button type="submit" class="move-btn">Progress</button>
+                        </form>
+                        <!-- Move to Review -->
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="review">
+                            <button type="submit" class="move-btn">Review</button>
+                        </form>
+                        <!-- Move to Done -->
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="done">
+                            <button type="submit" class="move-btn">Done</button>
+                        </form>
+                        <!-- Delete Task -->
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post">
+                            <button type="submit" class="delete-btn"
+                                    onclick="return confirm('Delete this task?')">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Show message if no tasks in this column -->
+                <p class="empty-column">No tasks in backlog</p>
+                {% endfor %}
+            </div>
+
+            <!-- TO DO COLUMN -->
+            <div class="column todo">
+                <h2 class="column-header">
+                    To Do
+                    <span class="task-count">{{ tasks.todo|length }}</span>
+                </h2>
+
+                {% for task in tasks.todo %}
+                <div class="task">
+                    <div class="task-title">{{ task.description }}</div>
+                    <div class="task-meta">
+                        {% if task.due_date %}
+                            Due: {{ task.due_date.strftime('%b %d, %Y') }}
+                        {% else %}
+                            Created: {{ task.created_at.strftime('%b %d') }}
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="backlog">
+                            <button type="submit" class="move-btn">Backlog</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="progress">
+                            <button type="submit" class="move-btn">Progress</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="review">
+                            <button type="submit" class="move-btn">Review</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="done">
+                            <button type="submit" class="move-btn">Done</button>
+                        </form>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post">
+                            <button type="submit" class="delete-btn"
+                                    onclick="return confirm('Delete this task?')">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <p class="empty-column">No tasks to do</p>
+                {% endfor %}
+            </div>
+
+            <!-- IN PROGRESS COLUMN -->
+            <div class="column progress">
+                <h2 class="column-header">
+                    In Progress
+                    <span class="task-count">{{ tasks.progress|length }}</span>
+                </h2>
+
+                {% for task in tasks.progress %}
+                <div class="task">
+                    <div class="task-title">{{ task.description }}</div>
+                    <div class="task-meta">
+                        {% if task.due_date %}
+                            Due: {{ task.due_date.strftime('%b %d, %Y') }}
+                        {% else %}
+                            Created: {{ task.created_at.strftime('%b %d') }}
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="backlog">
+                            <button type="submit" class="move-btn">Backlog</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="todo">
+                            <button type="submit" class="move-btn">To Do</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="review">
+                            <button type="submit" class="move-btn">Review</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="done">
+                            <button type="submit" class="move-btn">Done</button>
+                        </form>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post">
+                            <button type="submit" class="delete-btn"
+                                    onclick="return confirm('Delete this task?')">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <p class="empty-column">No tasks in progress</p>
+                {% endfor %}
+            </div>
+
+            <!-- REVIEW COLUMN -->
+            <div class="column review">
+                <h2 class="column-header">
+                    Review
+                    <span class="task-count">{{ tasks.review|length }}</span>
+                </h2>
+
+                {% for task in tasks.review %}
+                <div class="task">
+                    <div class="task-title">{{ task.description }}</div>
+                    <div class="task-meta">
+                        {% if task.due_date %}
+                            Due: {{ task.due_date.strftime('%b %d, %Y') }}
+                        {% else %}
+                            Created: {{ task.created_at.strftime('%b %d') }}
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="backlog">
+                            <button type="submit" class="move-btn">Backlog</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="todo">
+                            <button type="submit" class="move-btn">To Do</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="progress">
+                            <button type="submit" class="move-btn">Progress</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="done">
+                            <button type="submit" class="move-btn">Done</button>
+                        </form>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post">
+                            <button type="submit" class="delete-btn"
+                                    onclick="return confirm('Delete this task?')">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <p class="empty-column">No tasks in review</p>
+                {% endfor %}
+            </div>
+
+            <!-- DONE COLUMN -->
+            <div class="column done">
+                <h2 class="column-header">
+                    Done
+                    <span class="task-count">{{ tasks.done|length }}</span>
+                </h2>
+
+                {% for task in tasks.done %}
+                <div class="task">
+                    <div class="task-title">{{ task.description }}</div>
+                    <div class="task-meta">
+                        {% if task.due_date %}
+                            Due: {{ task.due_date.strftime('%b %d, %Y') }}
+                        {% else %}
+                            Completed: {{ task.created_at.strftime('%b %d') }}
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <!-- Done tasks can be moved back to other columns -->
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="backlog">
+                            <button type="submit" class="move-btn">Backlog</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="todo">
+                            <button type="submit" class="move-btn">To Do</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="progress">
+                            <button type="submit" class="move-btn">Progress</button>
+                        </form>
+                        <form action="{{ url_for('move_task', task_id=task.id) }}" method="post">
+                            <input type="hidden" name="column" value="review">
+                            <button type="submit" class="move-btn">Review</button>
+                        </form>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post">
+                            <button type="submit" class="delete-btn"
+                                    onclick="return confirm('Delete this task?')">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <p class="empty-column">No completed tasks</p>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <!-- =================================================================
+         FOOTER SECTION
+         ================================================================= -->
+    <footer>
+        Kanban Board · CS162 · <a href="#">Help</a> · <a href="#">Terms</a>
+    </footer>
+
+    <!-- =================================================================
+         JAVASCRIPT
+
+         Sets the minimum date for the due date input to today's date.
+         This prevents users from selecting past dates.
+         ================================================================= -->
+    <script>
+        // Wait for the DOM to be fully loaded before running
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the due date input element
+            const dueDateInput = document.getElementById('due-date');
+
+            if (dueDateInput) {
+                // Get today's date in YYYY-MM-DD format
+                // toISOString() returns format: 2024-01-15T00:00:00.000Z
+                // split('T')[0] extracts just the date part: 2024-01-15
+                const today = new Date().toISOString().split('T')[0];
+
+                // Set the minimum allowed date to today
+                dueDateInput.setAttribute('min', today);
+            }
+        });
+    </script>
+</body>
+
+</html>
